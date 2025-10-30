@@ -1,0 +1,38 @@
+cabal-version:      2.4
+name:               web-hs
+version:            0.1.0
+
+library
+    exposed-modules:
+        Webhandler,
+        Html,
+        Types
+    build-depends:
+        base,
+        ihp-hsx,
+        aeson,
+        aeson-qq,
+        blaze-html,
+        blaze-builder,
+        cryptonite,
+        http-conduit,
+        http-types,
+        monad-logger,
+        password,
+        persistent,
+        persistent-mysql,
+        persistent-postgresql,
+        persistent-sqlite,
+        regex-compat,
+        wai,
+        warp,
+        time,
+        bytestring,
+        text,
+        raw-strings-qq
+    hs-source-dirs:   lib
+    default-language: GHC2021
+    default-extensions:
+        QuasiQuotes,
+        OverloadedStrings,
+        LambdaCase
