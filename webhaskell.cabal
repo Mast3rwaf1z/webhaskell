@@ -1,12 +1,15 @@
 cabal-version:      2.4
-name:               web-hs
+name:               webhaskell
 version:            0.1.0
 
 library
     exposed-modules:
-        Webhandler,
-        Html,
-        Types
+        Network.WebHaskell.WebHaskell,
+        Network.WebHaskell.Helpers.Html,
+        Network.WebHaskell.Helpers.Json,
+        Network.WebHaskell.Types,
+        Network.WebHaskell.Lookup,
+        Network.WebHaskell.Examples.Impurity
     build-depends:
         base,
         ihp-hsx,
@@ -29,6 +32,7 @@ library
         time,
         bytestring,
         text,
+        process,
         raw-strings-qq
     hs-source-dirs:   lib
     default-language: GHC2021

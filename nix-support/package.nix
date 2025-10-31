@@ -27,6 +27,7 @@ pkgs.haskellPackages.mkDerivation {
         time
         bytestring
         text
+        process
         raw-strings-qq
     ];
     passthru.ghcPackages = hs: with hs; [
@@ -51,6 +52,7 @@ pkgs.haskellPackages.mkDerivation {
         time
         bytestring
         text
+        process
         raw-strings-qq
     ];
     doHaddock = false;
