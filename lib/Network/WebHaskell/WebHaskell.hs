@@ -12,7 +12,6 @@ import Network.HTTP.Types (status200)
 
 route :: Router b
 route request respond mapping = do
-    putStrLn "Got request"
     let (method, path) = formatRequest request
     putStrLn $ "Requested:  Method: " ++ (show method) ++ " Path: " ++ (show path)
     let (Route method1 path1 response) = mappingLookup method path mapping
