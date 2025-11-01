@@ -12,20 +12,12 @@ pkgs.haskellPackages.mkDerivation {
         aeson-qq
         blaze-html
         blaze-builder
-        cryptonite
         http-conduit
         http-types
-        monad-logger
-        password
-        persistent
-        persistent-mysql
-        persistent-postgresql
-        persistent-sqlite
-        regex-compat
         wai
         warp
-        time
         bytestring
+        directory
         text
         process
         raw-strings-qq
@@ -37,21 +29,13 @@ pkgs.haskellPackages.mkDerivation {
         aeson-qq
         blaze-html
         blaze-builder
-        cryptonite
         http-conduit
         http-types
-        monad-logger
-        password
-        persistent
-        persistent-mysql
-        persistent-postgresql
-        persistent-sqlite
-        regex-compat
         wai
         warp
-        time
         bytestring
         text
+        directory
         process
         raw-strings-qq
     ];

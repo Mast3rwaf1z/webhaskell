@@ -1,6 +1,6 @@
 module Network.WebHaskell.Lookup where
 
-import Network.WebHaskell.Types (Method (GET, PUT, POST, DELETE), Path, LookupType, Route (Route))
+import Network.WebHaskell.Types (Method (GET, PUT, POST, DELETE), Path, LookupType, Route (PlainRoute, FileRoute))
 
 import Network.Wai (Request (requestMethod, pathInfo))
 import IHP.HSX.QQ (hsx)
@@ -17,17 +17,35 @@ formatRequest request = (read method, path)
         method = B8.unpack $ requestMethod request
         path = map unpack $ pathInfo request
 
-mappingLookup :: LookupType
-mappingLookup GET path ((Route GET path1 response):xs)  | path == path1 = Route GET path response
-                                                                        | otherwise     = mappingLookup GET path xs
-mappingLookup PUT path ((Route PUT path1 response):xs)  | path == path1 = Route PUT path response
-                                                                        | otherwise     = mappingLookup PUT path xs
-mappingLookup POST path ((Route POST path1 response):xs)    | path == path1 = Route POST path response
-                                                                            | otherwise     = mappingLookup POST path xs
-mappingLookup DELETE path ((Route DELETE path1 response):xs)    | path == path1 = Route DELETE path response
-                                                                                | otherwise     = mappingLookup DELETE path xs
-mappingLookup method path (_:xs) = mappingLookup method path xs
-mappingLookup method path [] = Route method path (\r -> do
+routingLookup :: LookupType
+routingLookup GET path ((PlainRoute GET path1 response):xs)
+    | path == path1 = PlainRoute GET path response
+    | otherwise     = routingLookup GET path xs
+routingLookup GET path ((FileRoute GET path1 contentType filePath):xs)
+    | path == path1 = FileRoute GET path1 contentType filePath
+    | otherwise     = routingLookup GET path xs
+routingLookup PUT path ((PlainRoute PUT path1 response):xs)  
+    | path == path1 = PlainRoute PUT path response
+    | otherwise     = routingLookup PUT path xs
+routingLookup PUT path ((FileRoute PUT path1 contentType filePath):xs)
+    | path == path1 = FileRoute PUT path1 contentType filePath
+    | otherwise     = routingLookup PUT path xs
+routingLookup POST path ((PlainRoute POST path1 response):xs)
+    | path == path1 = PlainRoute POST path response
+    | otherwise     = routingLookup POST path xs
+routingLookup POST path ((FileRoute POST path1 contentType filePath):xs)
+    | path == path1 = FileRoute POST path1 contentType filePath
+    | otherwise     = routingLookup POST path xs
+routingLookup DELETE path ((PlainRoute DELETE path1 response):xs)
+    | path == path1 = PlainRoute DELETE path response
+    | otherwise     = routingLookup DELETE path xs
+routingLookup DELETE path ((FileRoute DELETE path1 contentType filePath):xs)
+    | path == path1 = FileRoute DELETE path1 contentType filePath
+    | otherwise     = routingLookup DELETE path xs
+
+routingLookup method path (_:xs) = routingLookup method path xs
+routingLookup method path [] = PlainRoute method path (\r -> do
     return (status404, [("Content-Type", "text/html")], fromString $ renderHtml $ [hsx|
         Error 404: Found nothing by ({method}, {path})
-    |]))
+    |])
+    )

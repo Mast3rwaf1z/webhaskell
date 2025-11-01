@@ -1,17 +1,18 @@
 module Network.WebHaskell.Examples.Impurity where
 
-import Network.WebHaskell.WebHaskell (webHaskell)
+import Network.WebHaskell.WebHaskell (defaultWebHaskell)
 import Network.WebHaskell.Helpers.Html (htmlRouteImpure, htmlRoute)
 import Network.WebHaskell.Helpers.Json (jsonRequest, jsonRequestImpure, jsonRequestJsonBody)
 
 import IHP.HSX.QQ (hsx)
 import System.Process (readProcess)
 import Network.HTTP.Types (status200)
-import Network.WebHaskell.Types (Route(Route), Method (POST, GET))
+import Network.WebHaskell.Types (Route(PlainRoute), Method (POST, GET))
 import Data.Aeson.QQ (aesonQQ)
+import Network.WebHaskell.Helpers.File (fileRequest)
 
 impurity :: IO ()
-impurity = webHaskell [
+impurity = defaultWebHaskell [
     htmlRoute [] [hsx|
         Hello WebHaskell!<br>
         What it means to be pure, is for the data to be deterministic, this means that this page can never change<br>
@@ -46,5 +47,6 @@ impurity = webHaskell [
             "uptime": #{uptime}
         }|]
     ),
-    jsonRequestJsonBody POST ["api", "echo"] return
+    jsonRequestJsonBody POST ["api", "echo"] return,
+    fileRequest GET ["api", "cabalfile"] "text/plain" "webhaskell.cabal"
     ]
