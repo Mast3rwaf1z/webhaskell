@@ -21,7 +21,7 @@ Network.WebHaskell.Examples.Impurity.impurity
 otherwise, a simple hello world could be:
 
 ```hs
-webHaskell [ htmlRoute ["index.html"] [hsx|
+defaultWebHaskell [ htmlRoute ["index.html"] [hsx|
     <!DOCTYPE html>
     Hello World!
 |] ]
