@@ -1,6 +1,6 @@
 module Network.WebHaskell.Routing where
 
-import Network.WebHaskell.Types (Router, Route (PlainRoute, FileRoute))
+import Network.WebHaskell.Types (Router, Route (Route, FileRoute))
 import Network.WebHaskell.Lookup (routingLookup, formatRequest)
 
 import Network.Wai (responseLBS, responseFile)
@@ -15,7 +15,7 @@ route request respond mapping = do
     putStrLn $ "Requested:  Method: " ++ (show method) ++ " Path: " ++ (show path)
     let route = routingLookup method path mapping
     case route of
-        (PlainRoute method path response) -> do
+        (Route method path response) -> do
             (status, headers, body) <- response request
             putStrLn $ "Responding: Status: " ++ (show status) ++ " headers: " ++ (show headers)
             respond $ responseLBS status headers $ body

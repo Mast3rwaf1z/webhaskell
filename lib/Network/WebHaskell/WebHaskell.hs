@@ -1,6 +1,6 @@
 module Network.WebHaskell.WebHaskell where
 
-import Network.WebHaskell.Types (Route(PlainRoute), Method (GET, POST), Router)
+import Network.WebHaskell.Types (Route(Route), Method (GET, POST), Router)
 import Network.WebHaskell.Lookup (formatRequest, routingLookup)
 import Network.WebHaskell.Config (Config (ConfigPort), configPort)
 import Network.WebHaskell.Routing (route)

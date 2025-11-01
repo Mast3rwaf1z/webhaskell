@@ -11,9 +11,9 @@ type Path = [String]
 type ResponseFunction = Request -> IO (Status, ResponseHeaders, ByteString)
 
 data Method = GET | POST | PUT | DELETE
-    deriving (Show, Read)
+    deriving (Show, Read, Eq)
 
-data Route = PlainRoute Method Path ResponseFunction
+data Route = Route Method Path ResponseFunction
            | FileRoute  Method Path BS.ByteString FilePath
 
 
