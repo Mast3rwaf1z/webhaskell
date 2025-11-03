@@ -18,7 +18,7 @@ webHaskell configuration routes = do
     putStrLn $ "Starting webhandler with port: " ++ show port
     run port $ \request respond -> do 
         let middleware = configMiddleware configuration
-        result <- all id <$> (sequence $ map (\item -> item request) middleware)
+        result <- all id <$> (sequence $ map ($ request) middleware)
         if result then        
             route request respond routes
         else
