@@ -1,6 +1,6 @@
 module Network.WebHaskell.Examples.Impurity where
 
-import Network.WebHaskell.WebHaskell (defaultWebHaskell)
+import Network.WebHaskell.WebHaskell (webHaskell)
 import Network.WebHaskell.Helpers.Html (htmlRouteImpure, htmlRoute)
 import Network.WebHaskell.Helpers.Json (jsonRequest, jsonRequestImpure, jsonRequestJsonBody)
 
@@ -10,9 +10,34 @@ import Network.HTTP.Types (status200)
 import Network.WebHaskell.Types (Route(Route), Method (POST, GET))
 import Data.Aeson.QQ (aesonQQ)
 import Network.WebHaskell.Helpers.File (fileRequest)
+import Network.WebHaskell.Config (Config(ConfigPort, ConfigMiddleware))
+import Network.Wai (Request (requestHeaderUserAgent))
+import Data.ByteString (isInfixOf, pack, ByteString)
 
-impurity :: IO ()
-impurity = defaultWebHaskell [
+checkUserAgent :: Request -> [ByteString] -> Bool
+checkUserAgent request [x] = case requestHeaderUserAgent request of
+    (Just useragent) -> isInfixOf x useragent
+    Nothing -> False
+checkUserAgent request (x:xs) = case requestHeaderUserAgent request of
+    (Just useragent) -> isInfixOf x useragent || checkUserAgent request xs
+    Nothing -> False
+checkUserAgent _ [] = False
+
+
+configuration :: [Config]
+configuration = [
+    ConfigPort 8080,
+    ConfigMiddleware (\r -> do
+        return $ checkUserAgent r ["Firefox"]
+    ),
+    ConfigMiddleware (\r -> do
+        putStrLn "Hello from middleware!"
+        return True
+    )
+    ]
+
+routes :: [Route]
+routes = [
     htmlRoute [] [hsx|
         Hello WebHaskell!<br>
         What it means to be pure, is for the data to be deterministic, this means that this page can never change<br>
@@ -21,7 +46,7 @@ impurity = defaultWebHaskell [
     htmlRouteImpure ["impure"] (\r -> do
         uptime <- readProcess "uptime" [] ""
         date <- readProcess "date" [] ""
-        free <- readProcess "free" [] ""
+        free <- readProcess "free" ["-h"] ""
         systemctl <- readProcess "systemctl" ["status"] ""
         return [hsx|
             Hello Impure WebHaskell!<br>
@@ -50,3 +75,7 @@ impurity = defaultWebHaskell [
     jsonRequestJsonBody POST ["api", "echo"] return,
     fileRequest GET ["api", "cabalfile"] "text/plain" "webhaskell.cabal"
     ]
+
+
+impurity :: IO ()
+impurity = webHaskell configuration routes
