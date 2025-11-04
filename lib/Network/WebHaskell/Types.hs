@@ -17,7 +17,7 @@ data Route = Route Method Path ResponseFunction
            | FileRoute  Method Path BS.ByteString FilePath
 
 
-type Router b = Request -> (Response -> IO b) -> [Route] -> IO b
+type Router b = Request -> [Route] -> IO Response
 type Impure b = (Request -> IO b)
 type ImpureJson b = (Value -> IO b)
 type LookupType = Method -> Path -> [Route] -> Route

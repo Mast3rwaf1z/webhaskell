@@ -10,35 +10,51 @@ import Network.HTTP.Types (status200)
 import Network.WebHaskell.Types (Route(Route), Method (POST, GET))
 import Data.Aeson.QQ (aesonQQ)
 import Network.WebHaskell.Helpers.File (fileRequest)
-import Network.WebHaskell.Config (Config(ConfigPort, ConfigMiddleware))
-import Network.Wai (Request (requestHeaderUserAgent))
+import Network.Wai (Request (requestHeaderUserAgent), responseStatus)
 import Data.ByteString (isInfixOf, pack, ByteString)
+import Network.WebHaskell.Config (Config (ConfigPreLogger, ConfigPrecondition, ConfigPort, ConfigPostLogger))
+import Network.WebHaskell.Lookup (formatRequest)
+import Text.Blaze.Html (Html)
 
 checkUserAgent :: Request -> [ByteString] -> Bool
-checkUserAgent request [x] = case requestHeaderUserAgent request of
-    (Just useragent) -> isInfixOf x useragent
+checkUserAgent request xs = case requestHeaderUserAgent request of
+    (Just userAgent) -> any (\x -> isInfixOf x userAgent) xs
     Nothing -> False
-checkUserAgent request (x:xs) = case requestHeaderUserAgent request of
-    (Just useragent) -> isInfixOf x useragent || checkUserAgent request xs
-    Nothing -> False
-checkUserAgent _ [] = False
 
 
 configuration :: [Config]
 configuration = [
     ConfigPort 8080,
-    ConfigMiddleware (\r -> do
+    ConfigPrecondition (\r -> do
         return $ checkUserAgent r ["Firefox"]
     ),
-    ConfigMiddleware (\r -> do
-        putStrLn "Hello from middleware!"
-        return True
+    ConfigPreLogger (\r -> do 
+        let (method, path) = formatRequest r
+        return $ "Requested: Method: " ++ (show method) ++ " Path: " ++ (show path)
+    ),
+    ConfigPostLogger (\r -> do
+        let status = responseStatus r
+        return $ "Responding: " ++ (show status)
     )
     ]
 
+format :: Html -> Html
+format html = [hsx|
+    <!DOCTYPE html>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            font-family: sans-serif;
+        }
+    </style>
+    <html>
+        {html}
+    </html>
+|]
+
 routes :: [Route]
 routes = [
-    htmlRoute [] [hsx|
+    htmlRoute [] $ format [hsx|
         Hello WebHaskell!<br>
         What it means to be pure, is for the data to be deterministic, this means that this page can never change<br>
         <a href="/impure">Go to the impure page!</a>
@@ -48,7 +64,7 @@ routes = [
         date <- readProcess "date" [] ""
         free <- readProcess "free" ["-h"] ""
         systemctl <- readProcess "systemctl" ["status"] ""
-        return [hsx|
+        return $ format [hsx|
             Hello Impure WebHaskell!<br>
             Likewise, impurity means to not be deterministic, and have variable data as you can see below:
             <a href="/">Go back to purity!</a>
