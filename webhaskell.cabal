@@ -9,6 +9,7 @@ library
         Network.WebHaskell.Helpers.Html,
         Network.WebHaskell.Helpers.Json,
         Network.WebHaskell.Helpers.File,
+        Network.WebHaskell.Helpers.RegexFormat,
         Network.WebHaskell.Types,
         Network.WebHaskell.Lookup,
         Network.WebHaskell.Config
@@ -27,6 +28,7 @@ library
         bytestring,
         text,
         directory,
+        regex-compat,
         process,
         raw-strings-qq
     hs-source-dirs:   lib

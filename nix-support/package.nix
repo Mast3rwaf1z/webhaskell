@@ -16,6 +16,7 @@ pkgs.haskellPackages.mkDerivation {
         http-types
         wai
         warp
+        regex-compat
         bytestring
         directory
         text
@@ -33,6 +34,7 @@ pkgs.haskellPackages.mkDerivation {
         http-types
         wai
         warp
+        regex-compat
         bytestring
         text
         directory

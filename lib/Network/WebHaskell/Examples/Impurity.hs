@@ -26,7 +26,7 @@ configuration :: [Config]
 configuration = [
     ConfigPort 8080,
     ConfigPrecondition (\r -> do
-        return $ checkUserAgent r ["Firefox"]
+        return $ checkUserAgent r ["Firefox", "curl"]
     ),
     ConfigPreLogger (\r -> do 
         let (method, path) = formatRequest r
@@ -54,12 +54,12 @@ format html = [hsx|
 
 routes :: [Route]
 routes = [
-    htmlRoute [] $ format [hsx|
+    htmlRoute "/" $ format [hsx|
         Hello WebHaskell!<br>
         What it means to be pure, is for the data to be deterministic, this means that this page can never change<br>
         <a href="/impure">Go to the impure page!</a>
     |],
-    htmlRouteImpure ["impure"] (\r -> do
+    htmlRouteImpure "/impure" (\r -> do
         uptime <- readProcess "uptime" [] ""
         date <- readProcess "date" [] ""
         free <- readProcess "free" ["-h"] ""
@@ -78,18 +78,18 @@ routes = [
             </pre>
         |]
     ),
-    jsonRequest GET ["api", "hello"] [aesonQQ|{
+    jsonRequest GET "/api/hello" [aesonQQ|{
         "value":"Hello World!"
     }|],
-    jsonRequestImpure GET ["api", "impure"] (\r -> do
+    jsonRequestImpure GET "/api/impure" (\r -> do
         uptime <- readProcess "uptime" [] ""
         return [aesonQQ|{
             "value":"Hello impure!",
             "uptime": #{uptime}
         }|]
     ),
-    jsonRequestJsonBody POST ["api", "echo"] return,
-    fileRequest GET ["api", "cabalfile"] "text/plain" "webhaskell.cabal"
+    jsonRequestJsonBody POST "/api/echo" return,
+    fileRequest GET "/api/cabalfile" "text/plain" "webhaskell.cabal"
     ]
 
 

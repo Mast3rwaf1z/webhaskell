@@ -5,8 +5,9 @@ import Network.HTTP.Types (Status, ResponseHeaders)
 import Network.Wai (ResponseReceived, Request, Response)
 import Data.Aeson (Value)
 import qualified Data.ByteString as BS
+import Text.Regex (Regex)
 
-type Path = [String]
+type Path = Regex
 
 type ResponseFunction = Request -> IO (Status, ResponseHeaders, ByteString)
 
@@ -20,5 +21,5 @@ data Route = Route Method Path ResponseFunction
 type Router b = Request -> [Route] -> IO Response
 type Impure b = (Request -> IO b)
 type ImpureJson b = (Value -> IO b)
-type LookupType = Method -> Path -> [Route] -> Route
+type LookupType = Method -> String -> [Route] -> Route
 

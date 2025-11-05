@@ -7,17 +7,18 @@ import Data.Aeson.QQ (aesonQQ)
 import Network.HTTP.Types (status200, status400)
 import Network.Wai (Request (requestBody), getRequestBodyChunk)
 import Data.ByteString (unpack)
+import Network.WebHaskell.Helpers.RegexFormat (regexFormat)
 
-jsonRequest :: Method -> Path -> Value -> Route
-jsonRequest method path json = Route method path (\r -> return (status200, [("Content-Type", "application/json")], encode json))
+jsonRequest :: Method -> String -> Value -> Route
+jsonRequest method path json = Route method (regexFormat path) (\r -> return (status200, [("Content-Type", "application/json")], encode json))
 
-jsonRequestImpure :: Method -> Path -> Impure Value -> Route
-jsonRequestImpure method path response = Route method path (\r -> do
+jsonRequestImpure :: Method -> String -> Impure Value -> Route
+jsonRequestImpure method path response = Route method (regexFormat path) (\r -> do
     json <- response r
     return (status200, [("Content-Type", "application/json")], encode json))
 
-jsonRequestJsonBody :: Method -> Path -> ImpureJson Value -> Route
-jsonRequestJsonBody method path response = Route method path (\r -> do
+jsonRequestJsonBody :: Method -> String -> ImpureJson Value -> Route
+jsonRequestJsonBody method path response = Route method (regexFormat path) (\r -> do
     body <- getRequestBodyChunk r
     let maybeJson = decodeStrict body
     case maybeJson of

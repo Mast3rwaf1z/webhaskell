@@ -6,6 +6,7 @@ import qualified Data.ByteString.Lazy as BS
 import System.Directory (doesFileExist)
 import Data.Aeson.QQ (aesonQQ)
 import Data.Aeson (encode)
+import Network.WebHaskell.Helpers.RegexFormat (regexFormat)
 
-fileRequest :: Method -> Path -> ByteString -> String -> Route
-fileRequest method path contentType filePath = FileRoute method path contentType filePath
+fileRequest :: Method -> String -> ByteString -> String -> Route
+fileRequest method path contentType filePath = FileRoute method (regexFormat path) contentType filePath

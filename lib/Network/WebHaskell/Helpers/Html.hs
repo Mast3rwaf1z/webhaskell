@@ -8,11 +8,12 @@ import Network.HTTP.Types (status200)
 import Data.String (IsString(fromString))
 import Text.Blaze.Html (Html)
 import Network.Wai (Request)
+import Network.WebHaskell.Helpers.RegexFormat (regexFormat)
 
-htmlRoute :: Path -> Html -> Route
-htmlRoute path html = Route GET path (\_ -> return (status200, [("Content-Type", "text/html")], fromString $ renderHtml html))
+htmlRoute :: String -> Html -> Route
+htmlRoute path html = Route GET (regexFormat path) (\_ -> return (status200, [("Content-Type", "text/html")], fromString $ renderHtml html))
 
-htmlRouteImpure :: Path -> Impure Html -> Route
-htmlRouteImpure path response = Route GET path (\r -> do
+htmlRouteImpure :: String -> Impure Html -> Route
+htmlRouteImpure path response = Route GET (regexFormat path) (\r -> do
     html <- response r
     return (status200, [("Content-Type", "text/html")], fromString $ renderHtml html))
